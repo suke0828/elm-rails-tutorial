@@ -4,6 +4,11 @@ import Browser
 import Browser.Navigation as Nav
 import Html exposing (..)
 import Html.Attributes exposing (..)
+import Route exposing (..)
+import StaticPages.About exposing (..)
+import StaticPages.Contact exposing (..)
+import StaticPages.Help exposing (..)
+import StaticPages.Home exposing (..)
 import Url
 
 
@@ -27,15 +32,23 @@ main =
 -- MODEL
 
 
+type Page
+    = HomePage
+    | AboutPage
+    | HelpPage
+    | ContactPage
+
+
 type alias Model =
     { key : Nav.Key
     , url : Url.Url
+    , page : Page
     }
 
 
 init : () -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
 init flags url key =
-    ( Model key url, Cmd.none )
+    ( Model key url HomePage, Cmd.none )
 
 
 
@@ -53,15 +66,43 @@ update msg model =
         LinkClicked urlRequest ->
             case urlRequest of
                 Browser.Internal url ->
-                    ( model, Nav.pushUrl model.key (Url.toString url) )
+                    case Route.toRoute (Url.toString url) of
+                        Home ->
+                            ( { model | page = HomePage }, Nav.pushUrl model.key (Url.toString url) )
+
+                        About ->
+                            ( { model | page = AboutPage }, Nav.pushUrl model.key (Url.toString url) )
+
+                        Help ->
+                            ( { model | page = HelpPage }, Nav.pushUrl model.key (Url.toString url) )
+
+                        Contact ->
+                            ( { model | page = ContactPage }, Nav.pushUrl model.key (Url.toString url) )
 
                 Browser.External href ->
                     ( model, Nav.load href )
 
         UrlChanged url ->
-            ( { model | url = url }
-            , Cmd.none
-            )
+            case Route.toRoute (Url.toString url) of
+                Home ->
+                    ( { model | url = url, page = HomePage }
+                    , Cmd.none
+                    )
+
+                About ->
+                    ( { model | url = url, page = AboutPage }
+                    , Cmd.none
+                    )
+
+                Help ->
+                    ( { model | url = url, page = HelpPage }
+                    , Cmd.none
+                    )
+
+                Contact ->
+                    ( { model | url = url, page = ContactPage }
+                    , Cmd.none
+                    )
 
 
 
@@ -79,12 +120,12 @@ subscriptions _ =
 
 view : Model -> Browser.Document Msg
 view model =
-    { title = "URL Interceptor"
+    { title = "Home | Ruby on Rails Tutorial Sample App"
     , body =
         -- Header
         [ nav [ attribute "aria-label" "main navigation", class "navbar is-black  is-fixed-top", attribute "role" "navigation" ]
             [ div [ class "navbar-brand" ]
-                [ a [ class "navbar-item", id "logo", href "index.html" ] [ text "Sample App" ]
+                [ a [ class "navbar-item", id "logo", href "/" ] [ text "Sample App" ]
                 , div [ class "navbar-burger", attribute "data-target" "navMenu" ]
                     [ span []
                         []
@@ -97,26 +138,26 @@ view model =
             , div [ class "navbar-menu" ]
                 [ div [ class "navbar-start" ] []
                 , div [ class "navbar-end" ]
-                    [ viewLink "Home"
-                    , viewLink "Help"
+                    [ viewLink "home"
+                    , viewLink "help"
                     , viewLink "Login"
                     ]
                 ]
             ]
 
         -- Container
-        , div [ class "container hero is-medium has-background-light" ]
-            [ div [ class "center hero-body" ]
-                [ h1 [ class "title is-1" ] [ text "Welcome to the Sample App" ]
-                , h2 [ class "subtitle is-3" ]
-                    [ text "This is the home page for the "
-                    , a [ href "https://railstutorial.jp/" ] [ text "Ruby on Rails Tutorial" ]
-                    , text " sample application"
-                    ]
-                , a [ class "button is-link", href "#" ] [ text "Sign up now!" ]
-                ]
-            ]
-        , a [ href "https://rubyonrails.org/" ] [ img [ src "assets/images/rails.svg", alt "Rails Logo", width 200 ] [] ]
+        , case model.page of
+            HomePage ->
+                StaticPages.Home.view
+
+            AboutPage ->
+                StaticPages.About.view
+
+            HelpPage ->
+                StaticPages.Help.view
+
+            ContactPage ->
+                StaticPages.Contact.view
 
         -- Footer
         , footer []
@@ -128,8 +169,8 @@ view model =
                 ]
             , nav []
                 [ ul []
-                    [ li [] [ a [ href "#" ] [ text "About" ] ]
-                    , li [] [ a [ href "#" ] [ text "Contact" ] ]
+                    [ li [] [ a [ href "about" ] [ text "About" ] ]
+                    , li [] [ a [ href "contact" ] [ text "Contact" ] ]
                     , li [] [ a [ href "https://news.railstutorial.org/" ] [ text "News" ] ]
                     ]
                 ]

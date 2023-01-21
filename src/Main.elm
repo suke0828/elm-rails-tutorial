@@ -10,6 +10,7 @@ import StaticPages.Contact exposing (..)
 import StaticPages.Help exposing (..)
 import StaticPages.Home exposing (..)
 import Url
+import Users.New exposing (..)
 
 
 
@@ -37,6 +38,7 @@ type Page
     | AboutPage
     | HelpPage
     | ContactPage
+    | SignUpPage
 
 
 type alias Model =
@@ -79,6 +81,9 @@ update msg model =
                         Contact ->
                             ( { model | page = ContactPage }, Nav.pushUrl model.key (Url.toString url) )
 
+                        SignUp ->
+                            ( { model | page = SignUpPage }, Nav.pushUrl model.key (Url.toString url) )
+
                 Browser.External href ->
                     ( model, Nav.load href )
 
@@ -101,6 +106,11 @@ update msg model =
 
                 Contact ->
                     ( { model | url = url, page = ContactPage }
+                    , Cmd.none
+                    )
+
+                SignUp ->
+                    ( { model | url = url, page = SignUpPage }
                     , Cmd.none
                     )
 
@@ -138,9 +148,9 @@ view model =
             , div [ class "navbar-menu" ]
                 [ div [ class "navbar-start" ] []
                 , div [ class "navbar-end" ]
-                    [ viewLink "home"
-                    , viewLink "help"
-                    , viewLink "Login"
+                    [ viewLink "home" "Home"
+                    , viewLink "help" "Help"
+                    , viewLink "login" "Log in"
                     ]
                 ]
             ]
@@ -158,6 +168,9 @@ view model =
 
             ContactPage ->
                 StaticPages.Contact.view
+
+            SignUpPage ->
+                Users.New.view
 
         -- Footer
         , footer []
@@ -179,6 +192,6 @@ view model =
     }
 
 
-viewLink : String -> Html msg
-viewLink path =
-    a [ class "navbar-item", href path ] [ text path ]
+viewLink : String -> String -> Html msg
+viewLink path name =
+    a [ class "navbar-item", href path ] [ text name ]

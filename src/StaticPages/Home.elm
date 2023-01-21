@@ -14,7 +14,7 @@ view =
                 , a [ href "https://railstutorial.jp/" ] [ text "Ruby on Rails Tutorial" ]
                 , text " sample application"
                 ]
-            , a [ class "button is-link", href "#" ] [ text "Sign up now!" ]
+            , a [ class "button is-link", href "signup" ] [ text "Sign up now!" ]
             ]
         , a [ href "https://rubyonrails.org/" ] [ img [ src "assets/images/rails.svg", alt "Rails Logo", width 200 ] [] ]
         ]

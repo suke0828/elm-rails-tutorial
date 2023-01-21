@@ -14,6 +14,7 @@ type Route
     | About
     | Help
     | Contact
+    | SignUp
 
 
 routeParser : Parser (Route -> a) a
@@ -23,6 +24,7 @@ routeParser =
         , map About (s "about")
         , map Help (s "help")
         , map Contact (s "contact")
+        , map SignUp (s "signup")
         ]
 
 

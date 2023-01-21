@@ -138,9 +138,9 @@ view model =
             , div [ class "navbar-menu" ]
                 [ div [ class "navbar-start" ] []
                 , div [ class "navbar-end" ]
-                    [ viewLink "home"
-                    , viewLink "help"
-                    , viewLink "Login"
+                    [ viewLink "home" "Home"
+                    , viewLink "help" "Help"
+                    , viewLink "login" "Log in"
                     ]
                 ]
             ]
@@ -179,6 +179,6 @@ view model =
     }
 
 
-viewLink : String -> Html msg
-viewLink path =
-    a [ class "navbar-item", href path ] [ text path ]
+viewLink : String -> String -> Html msg
+viewLink path  name =
+    a [ class "navbar-item", href path ] [ text name ]

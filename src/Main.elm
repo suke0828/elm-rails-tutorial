@@ -130,68 +130,82 @@ subscriptions _ =
 
 view : Model -> Browser.Document Msg
 view model =
-    { title = "Home | Ruby on Rails Tutorial Sample App"
-    , body =
-        -- Header
-        [ nav [ attribute "aria-label" "main navigation", class "navbar is-black  is-fixed-top", attribute "role" "navigation" ]
-            [ div [ class "navbar-brand" ]
-                [ a [ class "navbar-item", id "logo", href "/" ] [ text "Sample App" ]
-                , div [ class "navbar-burger", attribute "data-target" "navMenu" ]
-                    [ span []
-                        []
-                    , span []
-                        []
-                    , span []
-                        []
-                    ]
-                ]
-            , div [ class "navbar-menu" ]
-                [ div [ class "navbar-start" ] []
-                , div [ class "navbar-end" ]
-                    [ viewLink "home" "Home"
-                    , viewLink "help" "Help"
-                    , viewLink "login" "Log in"
-                    ]
-                ]
-            ]
+    case model.page of
+        HomePage ->
+            viewContent "Home" StaticPages.Home.view
 
-        -- Container
-        , case model.page of
-            HomePage ->
-                StaticPages.Home.view
+        AboutPage ->
+            viewContent "About" StaticPages.About.view
 
-            AboutPage ->
-                StaticPages.About.view
+        HelpPage ->
+            viewContent "Help" StaticPages.Help.view
 
-            HelpPage ->
-                StaticPages.Help.view
+        ContactPage ->
+            viewContent "Contact" StaticPages.Contact.view
 
-            ContactPage ->
-                StaticPages.Contact.view
+        SignUpPage ->
+            viewContent "Sign up" Users.New.view
 
-            SignUpPage ->
-                Users.New.view
 
-        -- Footer
-        , footer []
-            [ small []
-                [ text "The "
-                , a [ href "https://railstutorial.jp/" ] [ text "Ruby on Rails Tutorial" ]
-                , text " By "
-                , a [ href "https://www.michaelhartl.com/" ] [ text "Michael Hartl" ]
-                ]
-            , nav []
-                [ ul []
-                    [ li [] [ a [ href "about" ] [ text "About" ] ]
-                    , li [] [ a [ href "contact" ] [ text "Contact" ] ]
-                    , li [] [ a [ href "https://news.railstutorial.org/" ] [ text "News" ] ]
-                    ]
-                ]
-            ]
-        ]
-    }
+
+-- 補助関数
 
 
 viewLink : String -> String -> Html msg
 viewLink path name =
     a [ class "navbar-item", href path ] [ text name ]
+
+
+headerView : Html msg
+headerView =
+    nav [ attribute "aria-label" "main navigation", class "navbar is-black  is-fixed-top", attribute "role" "navigation" ]
+        [ div [ class "navbar-brand" ]
+            [ a [ class "navbar-item", id "logo", href "/" ] [ text "Sample App" ]
+            , div [ class "navbar-burger", attribute "data-target" "navMenu" ]
+                [ span []
+                    []
+                , span []
+                    []
+                , span []
+                    []
+                ]
+            ]
+        , div [ class "navbar-menu" ]
+            [ div [ class "navbar-start" ] []
+            , div [ class "navbar-end" ]
+                [ viewLink "home" "Home"
+                , viewLink "help" "Help"
+                , viewLink "login" "Log in"
+                ]
+            ]
+        ]
+
+
+footerView : Html msg
+footerView =
+    footer []
+        [ small []
+            [ text "The "
+            , a [ href "https://railstutorial.jp/" ] [ text "Ruby on Rails Tutorial" ]
+            , text " By "
+            , a [ href "https://www.michaelhartl.com/" ] [ text "Michael Hartl" ]
+            ]
+        , nav []
+            [ ul []
+                [ li [] [ a [ href "about" ] [ text "About" ] ]
+                , li [] [ a [ href "contact" ] [ text "Contact" ] ]
+                , li [] [ a [ href "https://news.railstutorial.org/" ] [ text "News" ] ]
+                ]
+            ]
+        ]
+
+
+viewContent : String -> Html msg -> { title : String, body : List (Html msg) }
+viewContent title content =
+    { title = title ++ " | Ruby on Rails Tutorial Sample App"
+    , body =
+        [ headerView
+        , content
+        , footerView
+        ]
+    }

@@ -18,8 +18,3 @@ view =
             ]
         , a [ href "https://rubyonrails.org/" ] [ img [ src "assets/images/rails.svg", alt "Rails Logo", width 200 ] [] ]
         ]
-
-
-viewLink : String -> Html msg
-viewLink path =
-    a [ class "navbar-item", href path ] [ text path ]

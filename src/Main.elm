@@ -130,52 +130,21 @@ subscriptions _ =
 
 view : Model -> Browser.Document Msg
 view model =
-    -- Container
     case model.page of
         HomePage ->
-            { title = "Home | Ruby on Rails Tutorial Sample App"
-            , body =
-                [ headerView
-                , StaticPages.Home.view
-                , footerView
-                ]
-            }
+            viewContent "Home" StaticPages.Home.view
 
         AboutPage ->
-            { title = "About | Ruby on Rails Tutorial Sample App"
-            , body =
-                [ headerView
-                , StaticPages.About.view
-                , footerView
-                ]
-            }
+            viewContent "About" StaticPages.About.view
 
         HelpPage ->
-            { title = "Help | Ruby on Rails Tutorial Sample App"
-            , body =
-                [ headerView
-                , StaticPages.Help.view
-                , footerView
-                ]
-            }
+            viewContent "Help" StaticPages.Help.view
 
         ContactPage ->
-            { title = "Contact | Ruby on Rails Tutorial Sample App"
-            , body =
-                [ headerView
-                , StaticPages.Contact.view
-                , footerView
-                ]
-            }
+            viewContent "Contact" StaticPages.Contact.view
 
         SignUpPage ->
-            { title = "SignUp | Ruby on Rails Tutorial Sample App"
-            , body =
-                [ headerView
-                , Users.New.view
-                , footerView
-                ]
-            }
+            viewContent "Sign up" Users.New.view
 
 
 
@@ -229,3 +198,14 @@ footerView =
                 ]
             ]
         ]
+
+
+viewContent : String -> Html msg -> { title : String, body : List (Html msg) }
+viewContent title content =
+    { title = title ++ " | Ruby on Rails Tutorial Sample App"
+    , body =
+        [ headerView
+        , content
+        , footerView
+        ]
+    }

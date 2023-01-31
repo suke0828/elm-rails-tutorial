@@ -19,11 +19,13 @@ type alias Model =
 
 type NameStatus
     = EmptyName
+    | LongName
     | ValidName
 
 
 type EmailStatus
     = EmptyEmail
+    | LongEmail
     | ValidEmail
 
 
@@ -84,12 +86,18 @@ validate model =
             if model.name == "" then
                 EmptyName
 
+            else if String.length model.name > 50 then
+                LongName
+
             else
                 ValidName
 
         emailStatus =
             if model.email == "" then
                 EmptyEmail
+
+            else if String.length model.email > 255 then
+                LongEmail
 
             else
                 ValidEmail
@@ -113,6 +121,9 @@ nameError status =
         EmptyName ->
             div [ style "color" "red" ] [ text "Name can't be blank" ]
 
+        LongName ->
+            div [ style "color" "red" ] [ text "Name should not be too long" ]
+
 
 emailError : EmailStatus -> Html msg
 emailError status =
@@ -122,3 +133,6 @@ emailError status =
 
         EmptyEmail ->
             div [ style "color" "red" ] [ text "Email can't be blank" ]
+
+        LongEmail ->
+            div [ style "color" "red" ] [ text "Email should not be too long" ]

@@ -3,6 +3,7 @@ module Users.New exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onInput)
+import Regex
 
 
 
@@ -26,6 +27,7 @@ type NameStatus
 type EmailStatus
     = EmptyEmail
     | LongEmail
+    | InvalidRegexEmail
     | ValidEmail
 
 
@@ -99,6 +101,9 @@ validate model =
             else if String.length model.email > 255 then
                 LongEmail
 
+            else if Regex.contains regexValidate model.email == False then
+                InvalidRegexEmail
+
             else
                 ValidEmail
     in
@@ -106,6 +111,16 @@ validate model =
         | nameValidation = nameStatus
         , emailValidation = emailStatus
     }
+
+
+validAddresses : String
+validAddresses =
+    "[\\w+\\-.]+@[a-z\\d\\-]+(\\.[a-z\\d\\-]+)*\\.[a-z]+"
+
+
+regexValidate : Regex.Regex
+regexValidate =
+    Maybe.withDefault Regex.never <| Regex.fromString validAddresses
 
 
 
@@ -136,3 +151,6 @@ emailError status =
 
         LongEmail ->
             div [ style "color" "red" ] [ text "Email should not be too long" ]
+
+        InvalidRegexEmail ->
+            div [ style "color" "red" ] [ text "Email be invalid" ]

@@ -1,12 +1,8 @@
 module Route exposing (..)
 
 import Browser.Dom exposing (Error(..))
-import Url
+import Url exposing (Url)
 import Url.Parser exposing ((</>), Parser, map, oneOf, parse, s, top)
-
-
-
--- Routing
 
 
 type Route
@@ -28,7 +24,6 @@ routeParser =
         ]
 
 
-
 toRoute : String -> Route
 toRoute string =
     case Url.fromString string of
@@ -37,3 +32,8 @@ toRoute string =
 
         Just url ->
             Maybe.withDefault Home (parse routeParser url)
+
+
+fromUrl : Url -> Maybe Route
+fromUrl url =
+    Url.Parser.parse routeParser url

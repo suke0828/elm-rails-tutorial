@@ -38,19 +38,18 @@ type Page
     | AboutPage
     | HelpPage
     | ContactPage
-    | SignUpPage
+    | SignUpPage Users.New.Model
 
 
 type alias Model =
     { key : Nav.Key
-    , url : Url.Url
     , page : Page
     }
 
 
 init : () -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
 init flags url key =
-    ( Model key url HomePage, Cmd.none )
+    Model key HomePage |> changeRouteTo (Route.fromUrl url)
 
 
 
@@ -60,6 +59,7 @@ init flags url key =
 type Msg
     = LinkClicked Browser.UrlRequest
     | UrlChanged Url.Url
+    | SignUpMsg Users.New.Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -68,51 +68,58 @@ update msg model =
         LinkClicked urlRequest ->
             case urlRequest of
                 Browser.Internal url ->
-                    case Route.toRoute (Url.toString url) of
-                        Home ->
-                            ( { model | page = HomePage }, Nav.pushUrl model.key (Url.toString url) )
-
-                        About ->
-                            ( { model | page = AboutPage }, Nav.pushUrl model.key (Url.toString url) )
-
-                        Help ->
-                            ( { model | page = HelpPage }, Nav.pushUrl model.key (Url.toString url) )
-
-                        Contact ->
-                            ( { model | page = ContactPage }, Nav.pushUrl model.key (Url.toString url) )
-
-                        SignUp ->
-                            ( { model | page = SignUpPage }, Nav.pushUrl model.key (Url.toString url) )
+                    ( model, Nav.pushUrl model.key (Url.toString url) )
 
                 Browser.External href ->
                     ( model, Nav.load href )
 
         UrlChanged url ->
-            case Route.toRoute (Url.toString url) of
-                Home ->
-                    ( { model | url = url, page = HomePage }
-                    , Cmd.none
-                    )
+            changeRouteTo (Route.fromUrl url) model
 
-                About ->
-                    ( { model | url = url, page = AboutPage }
-                    , Cmd.none
-                    )
+        SignUpMsg toMsg ->
+            case model.page of
+                SignUpPage toModel ->
+                    let
+                        ( newModel, topCmd ) =
+                            Users.New.update toMsg toModel
+                    in
+                    ( { model | page = SignUpPage newModel }, Cmd.map SignUpMsg topCmd )
 
-                Help ->
-                    ( { model | url = url, page = HelpPage }
-                    , Cmd.none
-                    )
+                _ ->
+                    ( model, Cmd.none )
 
-                Contact ->
-                    ( { model | url = url, page = ContactPage }
-                    , Cmd.none
-                    )
 
-                SignUp ->
-                    ( { model | url = url, page = SignUpPage }
-                    , Cmd.none
-                    )
+changeRouteTo : Maybe Route -> Model -> ( Model, Cmd Msg )
+changeRouteTo maybeRoute model =
+    case maybeRoute of
+        Nothing ->
+            ( { model | page = HomePage }, Cmd.none )
+
+        Just Home ->
+            ( { model | page = HomePage }, Cmd.none )
+
+        Just About ->
+            ( { model | page = AboutPage }, Cmd.none )
+
+        Just Help ->
+            ( { model | page = HelpPage }, Cmd.none )
+
+        Just Contact ->
+            ( { model | page = ContactPage }, Cmd.none )
+
+        Just SignUp ->
+            updateWith SignUpPage SignUpMsg Users.New.init model
+
+
+updateWith : (toPage -> Page) -> (toMsg -> Msg) -> ( toPage, Cmd toMsg ) -> { model | page : Page } -> ( { model | page : Page }, Cmd Msg )
+updateWith toPage toMsg toInit model =
+    let
+        ( toModel, toCmd ) =
+            toInit
+    in
+    ( { model | page = toPage toModel }
+    , Cmd.map toMsg toCmd
+    )
 
 
 
@@ -143,12 +150,8 @@ view model =
         ContactPage ->
             viewContent "Contact" StaticPages.Contact.view
 
-        SignUpPage ->
-            viewContent "Sign up" Users.New.view
-
-
-
--- 補助関数
+        SignUpPage signupModel ->
+            viewModel "SignUp" Users.New.view signupModel SignUpMsg
 
 
 viewLink : String -> String -> Html msg
@@ -206,6 +209,17 @@ viewContent title content =
     , body =
         [ headerView
         , content
+        , footerView
+        ]
+    }
+
+
+viewModel : String -> (content -> Html toMsg) -> content -> (toMsg -> msg) -> { title : String, body : List (Html msg) }
+viewModel title content model toMsg =
+    { title = title ++ " | Ruby on Rails Tutorial Sample App"
+    , body =
+        [ headerView
+        , content model |> Html.map toMsg
         , footerView
         ]
     }

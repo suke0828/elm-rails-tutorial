@@ -114,15 +114,19 @@ view model =
     div []
         [ h1 [] [ text "Sign up" ]
         , p [] [ text "This will be a signup page for new users." ]
-        , input [ type_ "text", placeholder "Name", value model.name, onInput Name ] []
+        , viewInput "text" "Name" model.name Name
         , nameError model.nameValidation
-        , input [ type_ "text", placeholder "Email", value model.email, onInput Email ] []
+        , viewInput "text" "Email" model.email Email
         , emailError model.emailValidation
-        , input [ type_ "text", placeholder "Password", value model.password, onInput Password ] []
+        , viewInput "text" "Password" model.password Password
         , passwordError model.passwordValidation
-        , input [ type_ "text", placeholder "Re-enter Password", value model.passwordAgain, onInput PasswordAgain ] []
+        , viewInput "text" "Re-enter Password" model.passwordAgain PasswordAgain
         , passwordAgainError model.passwordAgainValidation
         ]
+
+viewInput : String -> String -> String -> (String -> msg) -> Html msg
+viewInput t p v toMsg =
+    input [ type_ t, placeholder p, value v, onInput toMsg ] []
 
 
 

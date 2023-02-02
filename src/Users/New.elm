@@ -15,6 +15,10 @@ type alias Model =
     , nameValidation : NameStatus
     , email : String
     , emailValidation : EmailStatus
+    , password : String
+    , passwordValidation : PasswordStatus
+    , passwordAgain : String
+    , passwordAgainValidation : PasswordAgainStatus
     , dataBase : DataBase
     }
 
@@ -40,6 +44,18 @@ type EmailStatus
     | ValidEmail
 
 
+type PasswordStatus
+    = EmptyPassword
+    | ShortPassword
+    | ValidPassword
+
+
+type PasswordAgainStatus
+    = EmptyPasswordAgain
+    | NotMatchPassword
+    | ValidPasswordAgain
+
+
 
 -- Init
 
@@ -50,6 +66,10 @@ init =
       , nameValidation = ValidName
       , email = "aaa@email.jp"
       , emailValidation = ValidEmail
+      , password = "123456a"
+      , passwordValidation = ValidPassword
+      , passwordAgain = "123456a"
+      , passwordAgainValidation = ValidPasswordAgain
       , dataBase = { id = 1, name = "Tom", email = "sss@email.jp" }
       }
     , Cmd.none
@@ -63,6 +83,8 @@ init =
 type Msg
     = Name String
     | Email String
+    | Password String
+    | PasswordAgain String
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -74,6 +96,12 @@ update msg model =
         Email email ->
             ( validate { model | email = email }, Cmd.none )
 
+        Password password ->
+            ( validate { model | password = password }, Cmd.none )
+
+        PasswordAgain password ->
+            ( validate { model | passwordAgain = password }, Cmd.none )
+
 
 view : Model -> Html Msg
 view model =
@@ -84,6 +112,10 @@ view model =
         , nameError model.nameValidation
         , input [ type_ "text", placeholder "Email", value model.email, onInput Email ] []
         , emailError model.emailValidation
+        , input [ type_ "text", placeholder "Password", value model.password, onInput Password ] []
+        , passwordError model.passwordValidation
+        , input [ type_ "text", placeholder "Re-enter Password", value model.passwordAgain, onInput PasswordAgain ] []
+        , passwordAgainError model.passwordAgainValidation
         ]
 
 
@@ -119,10 +151,32 @@ validate model =
 
             else
                 ValidEmail
+
+        passwordStatus =
+            if model.password == "" then
+                EmptyPassword
+
+            else if String.length model.password < 6 then
+                ShortPassword
+
+            else
+                ValidPassword
+
+        passwordAgainStatus =
+            if model.passwordAgain == "" then
+                EmptyPasswordAgain
+
+            else if model.passwordAgain /= model.password then
+                NotMatchPassword
+
+            else
+                ValidPasswordAgain
     in
     { model
         | nameValidation = nameStatus
         , emailValidation = emailStatus
+        , passwordValidation = passwordStatus
+        , passwordAgainValidation = passwordAgainStatus
     }
 
 
@@ -170,3 +224,29 @@ emailError status =
 
         DuplicatedEmail ->
             div [ style "color" "red" ] [ text "Email be duplicate" ]
+
+
+passwordError : PasswordStatus -> Html msg
+passwordError status =
+    case status of
+        ValidPassword ->
+            div [ style "color" "green" ] [ text "OK" ]
+
+        EmptyPassword ->
+            div [ style "color" "red" ] [ text "Password can't be blank" ]
+
+        ShortPassword ->
+            div [ style "color" "red" ] [ text "Password must be at least 6 characters long" ]
+
+
+passwordAgainError : PasswordAgainStatus -> Html msg
+passwordAgainError status =
+    case status of
+        ValidPasswordAgain ->
+            div [ style "color" "green" ] [ text "OK" ]
+
+        EmptyPasswordAgain ->
+            div [ style "color" "red" ] [ text "Password can't be blank" ]
+
+        NotMatchPassword ->
+            div [ style "color" "red" ] [ text "Password do not match" ]

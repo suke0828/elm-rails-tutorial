@@ -124,6 +124,7 @@ view model =
         , passwordAgainError model.passwordAgainValidation
         ]
 
+
 viewInput : String -> String -> String -> (String -> msg) -> Html msg
 viewInput t p v toMsg =
     input [ type_ t, placeholder p, value v, onInput toMsg ] []
@@ -204,59 +205,74 @@ regexValidate =
 -- Error Message
 
 
+viewValidMsg : Html msg
+viewValidMsg =
+    div [ style "color" "green" ] [ text "OK" ]
+
+
+viewInvalidMsg : String -> Html msg
+viewInvalidMsg errorMsg =
+    div [ style "color" "red" ] [ text errorMsg ]
+
+
+viewBlankMsg : String -> Html msg
+viewBlankMsg msg =
+    div [ style "color" "red" ] [ text (msg ++ " can't be blank") ]
+
+
 nameError : NameStatus -> Html msg
 nameError status =
     case status of
         ValidName ->
-            div [ style "color" "green" ] [ text "OK" ]
+            viewValidMsg
 
         EmptyName ->
-            div [ style "color" "red" ] [ text "Name can't be blank" ]
+            viewBlankMsg "Name"
 
         LongName ->
-            div [ style "color" "red" ] [ text "Name should not be too long" ]
+            viewInvalidMsg "Name should not be too long"
 
 
 emailError : EmailStatus -> Html msg
 emailError status =
     case status of
         ValidEmail ->
-            div [ style "color" "green" ] [ text "OK" ]
+            viewValidMsg
 
         EmptyEmail ->
-            div [ style "color" "red" ] [ text "Email can't be blank" ]
+            viewBlankMsg "Email"
 
         LongEmail ->
-            div [ style "color" "red" ] [ text "Email should not be too long" ]
+            viewInvalidMsg "Email should not be too long"
 
         InvalidRegexEmail ->
-            div [ style "color" "red" ] [ text "Email be invalid" ]
+            viewInvalidMsg "Email be invalid"
 
         DuplicatedEmail ->
-            div [ style "color" "red" ] [ text "Email be duplicate" ]
+            viewInvalidMsg "Email be duplicate"
 
 
 passwordError : PasswordStatus -> Html msg
 passwordError status =
     case status of
         ValidPassword ->
-            div [ style "color" "green" ] [ text "OK" ]
+            viewValidMsg
 
         EmptyPassword ->
-            div [ style "color" "red" ] [ text "Password can't be blank" ]
+            viewBlankMsg "Password"
 
         ShortPassword ->
-            div [ style "color" "red" ] [ text "Password must be at least 6 characters long" ]
+            viewInvalidMsg "Password must be at least 6 characters long"
 
 
 passwordAgainError : PasswordAgainStatus -> Html msg
 passwordAgainError status =
     case status of
         ValidPasswordAgain ->
-            div [ style "color" "green" ] [ text "OK" ]
+            viewValidMsg
 
         EmptyPasswordAgain ->
-            div [ style "color" "red" ] [ text "Password can't be blank" ]
+            viewBlankMsg "Password confirm"
 
         NotMatchPassword ->
-            div [ style "color" "red" ] [ text "Password do not match" ]
+            viewInvalidMsg "Password do not match"

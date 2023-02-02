@@ -27,6 +27,7 @@ type alias DataBase =
     { id : Int
     , name : String
     , email : String
+    , password : String
     }
 
 
@@ -70,10 +71,15 @@ init =
       , passwordValidation = ValidPassword
       , passwordAgain = "123456a"
       , passwordAgainValidation = ValidPasswordAgain
-      , dataBase = { id = 1, name = "Tom", email = "sss@email.jp" }
+      , dataBase = userBot
       }
     , Cmd.none
     )
+
+
+userBot : DataBase
+userBot =
+    { id = 1, name = "Tom", email = "sss@email.jp", password = "123456a" }
 
 
 

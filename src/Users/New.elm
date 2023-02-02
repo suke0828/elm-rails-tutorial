@@ -15,6 +15,14 @@ type alias Model =
     , nameValidation : NameStatus
     , email : String
     , emailValidation : EmailStatus
+    , dataBase : DataBase
+    }
+
+
+type alias DataBase =
+    { id : Int
+    , name : String
+    , email : String
     }
 
 
@@ -28,6 +36,7 @@ type EmailStatus
     = EmptyEmail
     | LongEmail
     | InvalidRegexEmail
+    | DuplicatedEmail
     | ValidEmail
 
 
@@ -41,6 +50,7 @@ init =
       , nameValidation = ValidName
       , email = "aaa@email.jp"
       , emailValidation = ValidEmail
+      , dataBase = { id = 1, name = "Tom", email = "sss@email.jp" }
       }
     , Cmd.none
     )
@@ -104,6 +114,9 @@ validate model =
             else if Regex.contains regexValidate model.email == False then
                 InvalidRegexEmail
 
+            else if model.email == model.dataBase.email then
+                DuplicatedEmail
+
             else
                 ValidEmail
     in
@@ -154,3 +167,6 @@ emailError status =
 
         InvalidRegexEmail ->
             div [ style "color" "red" ] [ text "Email be invalid" ]
+
+        DuplicatedEmail ->
+            div [ style "color" "red" ] [ text "Email be duplicate" ]
